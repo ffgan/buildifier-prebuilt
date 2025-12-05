@@ -166,7 +166,7 @@ _DEFAULT_ASSETS = _create_assets(
     version = "v8.2.1",
     names = ["buildifier", "buildozer"],
     platforms = ["darwin", "linux", "windows"],
-    arches = ["amd64", "arm64"],
+    arches = ["amd64", "arm64", "riscv64"],
     sha256_values = {
         "buildifier_darwin_amd64": "9f8cffceb82f4e6722a32a021cbc9a5344b386b77b9f79ee095c61d087aaea06",
         "buildifier_darwin_arm64": "cfab310ae22379e69a3b1810b433c4cd2fc2c8f4a324586dfe4cc199943b8d5a",
