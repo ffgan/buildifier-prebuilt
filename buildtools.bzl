@@ -117,7 +117,7 @@ def _create_assets(
         names: Optional. A `list` of tools to include.
         platforms: Optional. A `list` of platforms to include.
         arches: Optional. A `list` of arches to include.
-        sha256_values: Optional. A `dict` of asset name to sha256.
+        sha256_values: A `dict` of asset name to sha256.
 
     Returns:
         A `list` of buildtools assets.
@@ -130,36 +130,27 @@ def _create_assets(
         fail("Expected a non-empty list for platforms.")
     if arches == None or arches == []:
         fail("Expected a non-empty list for arches.")
-    if sha256_values == None:
-        sha256_values = {}
+    if sha256_values == None or sha256_values == {}:
+        fail("Expected a non-empty dict for sha256_values.")
 
     assets = []
     for name in names:
         for platform in platforms:
             for arch in arches:
-                if platform == "windows" and arch == "arm64":
-                    continue
-                if platform == "windows" and arch == "riscv64":
-                    continue
-                if platform == "darwin" and arch == "riscv64":
-                    continue
-
                 uniq_name = _create_unique_name(
                     name = name,
                     platform = platform,
                     arch = arch,
                 )
 
-                if uniq_name not in sha256_values:
-                    fail("Missing sha256 value for {}".format(uniq_name))
-
-                assets.append(_create_asset(
-                    name = name,
-                    platform = platform,
-                    arch = arch,
-                    version = version,
-                    sha256 = sha256_values.get(uniq_name),
-                ))
+                if uniq_name in sha256_values:
+                    assets.append(_create_asset(
+                        name = name,
+                        platform = platform,
+                        arch = arch,
+                        version = version,
+                        sha256 = sha256_values.get(uniq_name),
+                    ))
     return assets
 
 _DEFAULT_ASSETS = _create_assets(
