@@ -194,10 +194,74 @@ def _create_assets_test(ctx):
 
 create_assets_test = unittest.make(_create_assets_test)
 
+def _create_assets_by_sha256_values_test(ctx):
+    env = unittest.begin(ctx)
+
+    # this example is come from kubevirt, see https://github.com/kubevirt/kubevirt/blob/v1.7.0/WORKSPACE#L84
+    shas = {
+        "buildifier_darwin_amd64": "375f823103d01620aaec20a0c29c6cbca99f4fd0725ae30b93655c6704f44d71",
+        "buildifier_darwin_arm64": "5a6afc6ac7a09f5455ba0b89bd99d5ae23b4174dc5dc9d6c0ed5ce8caac3f813",
+        "buildifier_linux_amd64": "5474cc5128a74e806783d54081f581662c4be8ae65022f557e9281ed5dc88009",
+        "buildifier_linux_arm64": "0bf86c4bfffaf4f08eed77bde5b2082e4ae5039a11e2e8b03984c173c34a561c",
+        "buildifier_linux_s390x": "e2d79ff5885d45274f76531f1adbc7b73a129f59e767f777e8fbde633d9d4e2e",
+        "buildifier_windows_amd64": "370cd576075ad29930a82f5de132f1a1de4084c784a82514bd4da80c85acf4a8",
+        "buildozer_darwin_amd64": "854c9583efc166602276802658cef3f224d60898cfaa60630b33d328db3b0de2",
+        "buildozer_darwin_arm64": "31b1bfe20d7d5444be217af78f94c5c43799cdf847c6ce69794b7bf3319c5364",
+        "buildozer_linux_amd64": "3305e287b3fcc68b9a35fd8515ee617452cd4e018f9e6886b6c7cdbcba8710d4",
+        "buildozer_linux_arm64": "0b5a2a717ac4fc911e1fec8d92af71dbb4fe95b10e5213da0cc3d56cea64a328",
+        "buildozer_linux_s390x": "7e28da8722656e800424989f5cdbc095cb29b2d398d33e6b3d04e0f50bc0bb10",
+        "buildozer_windows_amd64": "58d41ce53257c5594c9bc86d769f580909269f68de114297f46284fbb9023dcf",
+    }
+
+    arches = [
+        "amd64",
+        "arm64",
+        "s390x",
+    ]
+    names = [
+        "buildifier",
+        "buildozer",
+    ]
+    platforms = [
+        "darwin",
+        "linux",
+        "windows",
+    ]
+
+    buildtools.create_assets_by_sha256_values(
+        version = "v7.3.1",
+        arches = arches,
+        names = names,
+        platforms = platforms,
+        sha256_values = shas,
+    )
+
+    # Without the following line, it will cause `create_assets` to fail.
+    shas = shas | {
+        # invalid hash,in order to pass check
+        "buildifier_darwin_s390x": "5101795c6b90e3aca6d8dc4efe15fd818a8b6053f34284551f6ba7fa57ad8415",
+        "buildozer_darwin_s390x": "5101795c6b90e3aca6d8dc4efe15fd818a8b6053f34284551f6ba7fa57ad8415",
+        "buildifier_windows_s390x": "5101795c6b90e3aca6d8dc4efe15fd818a8b6053f34284551f6ba7fa57ad8415",
+        "buildozer_windows_s390x": "5101795c6b90e3aca6d8dc4efe15fd818a8b6053f34284551f6ba7fa57ad8415",
+    }
+
+    buildtools.create_assets(
+        version = "v7.3.1",
+        arches = arches,
+        names = names,
+        platforms = platforms,
+        sha256_values = shas,
+    )
+
+    return unittest.end(env)
+
+create_assets_by_sha256_values_test = unittest.make(_create_assets_by_sha256_values_test)
+
 def buildtools_test_suite():
     return unittest.suite(
         "buildtools_tests",
         create_asset_test,
+        create_assets_by_sha256_values_test,
         create_unique_name_test,
         default_assets_test,
         asset_json_roundtrip_test,
